@@ -26,11 +26,12 @@ def get_calibration_value(line: str) -> int:
     return 10 * int(first) + int(last)
 
 
-def first_digit(line: Iterable[str], digits: Set[str]=set(string.digits)) -> str:
+def first_digit(line: Iterable[str], digits: Set[str] = set(string.digits)) -> str:
     for char in line:
         if char in digits:
             return char
     raise ValueError(line)
+
 
 if __name__ == "__main__":
     main()

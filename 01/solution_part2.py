@@ -26,7 +26,7 @@ class Solution:
         last = self.first_digit(line, regex.REVERSE)
         return 10 * self.wordmap[first] + self.wordmap[last]
 
-    def first_digit(self, line: str, flags: int=0) -> str:
+    def first_digit(self, line: str, flags: int = 0) -> str:
         match = regex.search(self.pattern, line, flags)
         if match:
             return match.group()
@@ -48,9 +48,11 @@ WORDMAP = {
     },
 }
 
+
 def main() -> None:
     problem = Path(sys.argv[1])
     print(Solution(problem, WORDMAP).calibration_sum())
+
 
 if __name__ == "__main__":
     main()

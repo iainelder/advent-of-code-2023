@@ -14,3 +14,8 @@ repos:
         language: system
         types: [python]
         entry: poetry run mypy --strict
+
+  - repo: https://github.com/psf/black
+    rev: "23.11.0"
+    hooks:
+      - id: black
