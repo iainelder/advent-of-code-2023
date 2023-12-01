@@ -3,6 +3,7 @@ name = "advent-of-code"
 version = "0.1.0"
 description = ""
 authors = ["Iain Samuel McLean Elder <iain@isme.es>"]
+packages = [{include = "advent_of_code"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
