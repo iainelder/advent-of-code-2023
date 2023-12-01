@@ -1,7 +1,9 @@
-from pytest import CaptureFixture
-from pathlib import Path
 import sys
+from pathlib import Path
 from unittest.mock import patch
+
+from pytest import CaptureFixture
+
 import advent_of_code.day01.part1
 import advent_of_code.day01.part2
 

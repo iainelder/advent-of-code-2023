@@ -1,10 +1,11 @@
 #!/bin/env python3
 
-from pathlib import Path
-import regex
-import sys
 import string
+import sys
+from pathlib import Path
 from typing import Dict, Iterable
+
+import regex
 
 
 class Solution:
