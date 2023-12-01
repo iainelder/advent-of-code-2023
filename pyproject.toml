@@ -12,6 +12,7 @@ regex = "^2023.10.3"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.5.0"
+mypy = "^1.7.1"
 
 [build-system]
 requires = ["poetry-core"]
