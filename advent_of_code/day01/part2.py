@@ -4,14 +4,14 @@ from pathlib import Path
 import regex
 import sys
 import string
-from typing import Dict, Iterable, Pattern
+from typing import Dict, Iterable
 
 
 class Solution:
-    def __init__(self, problem: Path, wordmap: Dict[str, int]) -> None:
+    def __init__(self, problem: Path, wordmap: Dict[str, int] = {}) -> None:
         self.problem = problem
-        self.wordmap = wordmap
-        self.pattern = "|".join(wordmap)
+        self.wordmap = wordmap or WORDMAP
+        self.pattern = "|".join(self.wordmap)
 
     def calibration_sum(self) -> int:
         return sum(self.iter_calibration_values())

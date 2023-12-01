@@ -2,16 +2,17 @@ from pytest import CaptureFixture
 from pathlib import Path
 import sys
 from unittest.mock import patch
-from advent_of_code.day01.part1 import main
-from advent_of_code.day01.part2 import Solution, WORDMAP
+import advent_of_code.day01.part1
+import advent_of_code.day01.part2
 
 
 def test_day01_part1(capsys: CaptureFixture[str]) -> None:
     with patch.object(sys, "argv", ["test_part1", "tests/day01/input"]):
-        main()
+        advent_of_code.day01.part1.main()
     out, err = capsys.readouterr()
     assert out == "55447\n"
 
 
 def test_day01_part2() -> None:
-    assert Solution(Path("tests/day01/input"), WORDMAP).calibration_sum() == 54706
+    solution = advent_of_code.day01.part2.Solution(Path("tests/day01/input"))
+    assert solution.calibration_sum() == 54706
