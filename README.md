@@ -24,3 +24,4 @@ The secondary goal is to learn more about the Python programming language, its s
 * It's easy to switch between Python versions in Poetry
 * Moving tests is easy with PyTest because it discovers based on name
 * It's easier to group the test day with each day's solution
+* Use table-driven tests to avoid test code repitition
