@@ -25,3 +25,4 @@ The secondary goal is to learn more about the Python programming language, its s
 * Moving tests is easy with PyTest because it discovers based on name
 * It's easier to group the test day with each day's solution
 * Use table-driven tests to avoid test code repitition
+* Part 2 was easy because I already found a good abstraction in part 1 (`max_hand` is what they call the "minimum set of cubes")

@@ -1,4 +1,5 @@
 from functools import reduce
+from math import prod
 from operator import or_
 from pathlib import Path
 from typing import Counter, Iterable, Tuple
@@ -33,6 +34,9 @@ class Game:
     def max_hand(self) -> Counter[str]:
         return reduce(or_, self.hands)
 
+    def power(self) -> int:
+        return prod(self.max_hand().values())
+
 
 class Solution:
     def __init__(self, *, game_list: Path, bag: Counter[str]) -> None:
@@ -41,6 +45,9 @@ class Solution:
 
     def possible_game_id_sum(self) -> int:
         return sum(game.id for game in self.possible_games())
+
+    def power_sum(self) -> int:
+        return sum(game.power() for game in self.games())
 
     def possible_games(self) -> Iterable[Game]:
         for game in self.games():

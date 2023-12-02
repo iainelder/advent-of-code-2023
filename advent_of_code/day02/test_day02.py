@@ -15,12 +15,27 @@ from advent_of_code.day02.part1 import Game, Solution
         ("advent_of_code/day02/input/puzzle", 2617),
     ],
 )
-def test_solves_day_2_part_1(game_list: str, id_sum: int) -> None:
+def test_solves_part_1(game_list: str, id_sum: int) -> None:
     solution = Solution(
         game_list=Path(game_list),
         bag=Counter(red=12, green=13, blue=14),
     )
     assert solution.possible_game_id_sum() == id_sum
+
+
+@pytest.mark.parametrize(
+    "game_list,power_sum",
+    [
+        ("advent_of_code/day02/input/sample", 2286),
+        ("advent_of_code/day02/input/puzzle", 59795),
+    ],
+)
+def test_solves_part_2(game_list: str, power_sum: int) -> None:
+    solution = Solution(
+        game_list=Path(game_list),
+        bag=Counter(red=12, green=13, blue=14),
+    )
+    assert solution.power_sum() == power_sum
 
 
 # Unit tests
@@ -55,3 +70,7 @@ def test_bag_includes_possible_game(game1: Game) -> None:
 def test_bag_doesnt_include_impossible_game(game1: Game) -> None:
     bag = Counter(red=1, green=1, blue=1)
     assert not game1.possible_in_bag(bag)
+
+
+def test_game_has_power(game1: Game) -> None:
+    assert game1.power() == 48
