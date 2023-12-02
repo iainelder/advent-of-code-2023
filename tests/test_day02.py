@@ -8,12 +8,20 @@ from advent_of_code.day02.part1 import Game, Solution
 # Puzzle tests
 
 
-def test_day02_part1() -> None:
+def test_solves_day_2_part_1_small_input() -> None:
     solution = Solution(
         game_list=Path("tests/day02/small_input"),
         bag=Counter(red=12, green=13, blue=14),
     )
     assert solution.possible_game_id_sum() == 8
+
+
+def test_solves_day_2_part_1_large_input() -> None:
+    solution = Solution(
+        game_list=Path("tests/day02/large_input"),
+        bag=Counter(red=12, green=13, blue=14),
+    )
+    assert solution.possible_game_id_sum() == 2617
 
 
 # Unit tests
