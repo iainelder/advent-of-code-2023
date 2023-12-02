@@ -118,3 +118,59 @@ False
 >>> bag <= hand
 False
 ```
+
+A Game then is a list of Counters with a numeric ID. I model it as a class.
+
+I need to parse a game object from a line of text. A factory function on the Game class seems like a neat way to do it.
+
+Google `python class method factory`.
+
+Reading:
+
+* [Isaac Rodriguez from Real Python's "The Factory Method Pattern and Its Implementation in Python](https://realpython.com/factory-method-python/). Not my use case.
+* [Danyson's How classmethod in Python helps in implementing Factory methods?](https://dev.to/danyson/how-classmethod-in-python-helps-in-implementing-factory-methods-23gl). Explains difference between `staticmethod` (no self) and `classmethod` (first argument is the class object). The example looks wrong. A factory class shouldn't subclass what it makes. Perhaps it's just poorly named and confusing matters with an abstract base class.
+* [Henry Schreiner's "Factory classmethods in Python"](https://iscinumpy.gitlab.io/post/factory-classmethods-in-python/). A good example of using a `classmethod` factory to convert different representations of vectors. Goes into more advanced topics such as bypassing `__init__` with `__new__`. I don't need to do that here. The examples are untyped.
+
+Google `python mypy classmethod factory`.
+
+* https://stackoverflow.com/questions/46007544/python-3-type-hint-for-a-factory-method-on-a-base-class-returning-a-child-class
+* https://github.com/python/typing/issues/58
+
+Results are talking about generics and I don't care about that.
+
+But I can just omit the type of `cls` in the same way that I omit the type of `self`. And the method returns a `Game` instance, so use a [mypy forward reference](https://mypy.readthedocs.io/en/stable/runtime_troubles.html#forward-references).
+
+Is there elegant syntax to infix an operator in a list of values? Like this but without using `eval`.
+
+```pycon
+>>> hands = [Counter(red=3, blue=1, green=1), Counter(red=1, blue=4, green=1), Counter(red=1, blue=1, green=5)]
+>>> "|".join([str(h) for h in hands])
+"Counter({'red': 3, 'blue': 1, 'green': 1})|Counter({'blue': 4, 'red': 1, 'green': 1})|Counter({'green': 5, 'red': 1, 'blue': 1})"
+>>> eval("|".join([str(h) for h in hands]))
+Counter({'green': 5, 'blue': 4, 'red': 3})
+```
+
+Google `python infix a list`.
+
+* [das-g's answer on Stack Overflow to "python infix operator on a list of objects"](https://stackoverflow.com/questions/41686624/python-infix-operator-on-a-list-of-objects)
+
+Looks like a use for `reduce`.
+
+```pycon
+>>> from functools import reduce
+>>> from operator import or_
+>>> reduce(or_, hands)
+Counter({'green': 5, 'blue': 4, 'red': 3})
+```
+
+The correct way to write the inclusion test is:
+
+```python
+hand <= bag
+```
+
+And you can read it as "Can you draw the hand from the bag?"
+
+Replace List with Iterable. Do less to go faster. [See Mike Haertel's "why GNU grep is fast"](https://lists.freebsd.org/pipermail/freebsd-current/2010-August/019310.html). Here I don't need to index into the list of games. I just need to compute the max hand.
+
+I had thought about using a complex regular expression to parse out the game from the line, but since I'm using a series of iterators that's not possible. Even if I did parse it all out at once I think it would be easier to read using string operations such as split and strip. I leard that once from a web scraping book with examples in PHP I read in 2010 (can't remember the author).
