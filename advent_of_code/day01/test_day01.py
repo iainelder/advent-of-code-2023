@@ -5,8 +5,7 @@ from unittest.mock import patch
 import pytest
 from pytest import CaptureFixture
 
-import advent_of_code.day01.part1
-import advent_of_code.day01.part2
+from advent_of_code.day01 import part1, part2
 
 
 @pytest.mark.parametrize(
@@ -18,8 +17,8 @@ import advent_of_code.day01.part2
 )
 def test_solve_part1(capsys: CaptureFixture[str], document: str, value: str) -> None:
     with patch.object(sys, "argv", ["test_part1", document]):
-        advent_of_code.day01.part1.main()
-    out, err = capsys.readouterr()
+        part1.main()
+    out, _ = capsys.readouterr()
     assert out == value
 
 
@@ -31,5 +30,4 @@ def test_solve_part1(capsys: CaptureFixture[str], document: str, value: str) -> 
     ],
 )
 def test_solve_part2(document: str, value: int) -> None:
-    solution = advent_of_code.day01.part2.Solution(Path(document))
-    assert solution.calibration_sum() == value
+    assert part2.Solution(Path(document)).calibration_sum() == value
