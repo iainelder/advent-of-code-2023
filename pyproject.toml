@@ -6,7 +6,7 @@ authors = ["Iain Samuel McLean Elder <iain@isme.es>"]
 packages = [{include = "advent_of_code"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 regex = "^2023.10.3"
 
 
