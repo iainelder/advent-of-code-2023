@@ -8,20 +8,19 @@ from advent_of_code.day02.part1 import Game, Solution
 # Puzzle tests
 
 
-def test_solves_day_2_part_1_small_input() -> None:
+@pytest.mark.parametrize(
+    "game_list,id_sum",
+    [
+        ("advent_of_code/day02/input/sample", 8),
+        ("advent_of_code/day02/input/puzzle", 2617),
+    ],
+)
+def test_solves_day_2_part_1(game_list: str, id_sum: int) -> None:
     solution = Solution(
-        game_list=Path("advent_of_code/day02/small_input"),
+        game_list=Path(game_list),
         bag=Counter(red=12, green=13, blue=14),
     )
-    assert solution.possible_game_id_sum() == 8
-
-
-def test_solves_day_2_part_1_large_input() -> None:
-    solution = Solution(
-        game_list=Path("advent_of_code/day02/large_input"),
-        bag=Counter(red=12, green=13, blue=14),
-    )
-    assert solution.possible_game_id_sum() == 2617
+    assert solution.possible_game_id_sum() == id_sum
 
 
 # Unit tests
