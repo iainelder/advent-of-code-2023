@@ -4,6 +4,8 @@ I want read every character in the text no more than once. I need a tokenizer th
 
 ## Reading about parsers, lexes, and scanners
 
+2023-12-03.
+
 I read [pythonmembers.club's "building a lexer in python - a tutorial"](https://medium.com/@pythonmembers.club/building-a-lexer-in-python-a-tutorial-3b6de161fe84) to understand that maybe what I need is a lexer.
 
 Google `python configurable lexer`.
@@ -33,6 +35,8 @@ Google `python re scanner`.
 
 ## Regular expression?
 
+2023-12-03.
+
 I haven't read any of the above yet. I just got an idea of what's out there.
 
 An even simpler way to do it would be to scan and remember two lines ahead and two lines back.
@@ -42,6 +46,8 @@ If we assume that every line is the same length, that the file describes a grid,
 Can I use a multiline regular expression to detect matching cases? (I discard this line of thought because the expression isn't regular but it varies according to how far from a newline the part symbol is.)
 
 ## Test harness
+
+2023-12-03.
 
 First write a test harness to test simple cases, even more simple than the the sample input.
 
@@ -68,6 +74,8 @@ I don't need the full set of Path functions. I just need a function to write the
 If I do this, then I can just use the function that I would have attached directly, without attaching it. Pass the object in explcitly instead of hiding that with self.
 
 ## PLY (Python Lex-Yacc)
+
+2023-12-03.
 
 Read [David M Beazley's documentation for PLY](https://www.dabeaz.com/ply/ply.html).
 
@@ -114,6 +122,8 @@ Notes:
 * ["What is a Context-Sensitive Grammar/Language?"](https://www.youtube.com/watch?v=PjXA2cvfHF0&t=2s) - rabit hole!
 
 ## Lark Parser
+
+2023-12-03.
 
 This looks like a good place to start. It's widely used, frequently updated, and has a lot of contributors.
 
@@ -274,3 +284,104 @@ parser = Lark(grammar)
 
 tree = parser.parse("1 22 333")
 ```
+
+# Open issue for parsing from a stream
+
+2023-12-05.
+
+I'm now behind on the puzzles, but that's because I'm learning.
+
+I open [issue 1375](https://github.com/lark-parser/lark/issues/1375) in the Lark GitHub project to ask how to get Lark to read the file for me. I reference the author's example in issue 488 that doesn't work for me.
+
+```python
+from lark import Lark
+from pathlib import Path
+
+grammar_path = Path("my_grammar.lark")
+grammar_path.write_text("""
+start: NUMBER*
+%import common.NUMBER
+%import common.WS
+%ignore WS
+""")
+
+input_path = Path("my_input")
+input_path.write_text("1 22 333")
+
+parser = Lark.open(grammar_path, parser="lalr")
+with open("my_input") as f:
+    result = parser.parse(f)
+```
+
+I expect result to hold a `Tree` object, but instead I get this error:
+
+```text
+TypeError: object of type '_io.TextIOWrapper' has no len()
+```
+
+# Consider a transformer
+
+2023-12-05.
+
+I read the [transformer documentation](https://lark-parser.readthedocs.io/en/stable/visitors.html), but I don't get it.
+
+I don't think I need a transformer after all.
+
+I don't need a tree. I just a need a stream of tokens tagged with the line and column. So I just need the lexer.
+
+## Configure the lexer
+
+2023-12-05.
+
+## Use a spatial index
+
+2023-11-05.
+
+Read [Javier Canales Luna's "GeoPandas Tutorial: An Introduction to Geospatial Analysis"])(https://www.datacamp.com/tutorial/geopandas-tutorial-geospatial-analysis).
+
+GeoPandas looks awesome, but I don't need most of its features.
+
+It depends on these libraries:
+
+* [shapely](https://shapely.readthedocs.io/en/stable/): manipulation and analysis of planar geometric objects. Uses GEOS like PostGIS.
+* [fiona](https://fiona.readthedocs.io/en/stable/): streams simple feature data to and from GIS formats like GeoPackage and Shapefile. I don't think I need this.
+* [pyproj](https://github.com/pyproj4/pyproj): Python interface to [PROJ](https://proj.org/) (cartographic projections and coordinate transformations library). I don't think I need this.
+* [rtree](https://rtree.readthedocs.io/en/latest/tutorial.html): Python wrapper of [libspatialindex](https://libspatialindex.org/en/latest/). Implements nearest-neighbor search. This is the operation I need.
+
+I think I need rtree and maybe shapely.
+
+```pycon
+>>> import rtree
+>>> from rtree import index
+>>> idx = index.Index()
+>>> idx.insert(0, (0, 1, 0, 3))
+>>> idx.bounds
+[0.0, 1.0, 0.0, 3.0]
+>>> list(idx.intersection(idx.bounds))
+[0]
+>>> idx.insert(1, (1, 3, 2, 4))
+>>> idx.bounds
+[0.0, 1.0, 2.0, 4.0]
+>>> list(idx.intersection(idx.bounds))
+[0, 1]
+>>> [(item.id, item.bbox) for item in idx.intersection(idx.bounds, objects=True)]
+[(0, [0.0, 1.0, 0.0, 3.0]), (1, [1.0, 3.0, 2.0, 4.0])]
+```
+
+The `nearest` neighbor function doesn't do what I hoped. It returns up to a certain number of nearest objects.
+
+I want to find everything that intersects with a buffer.
+
+shapely can make a buffer.
+
+shapely has an `STRTree` class with a `query_nearest` feature. It has a `max_distance` parameter. Maybe I can use it instead of making an explicit buffer.
+
+I start to construct polygons before I realize that I need a way to link them to the metadata.
+
+[You can no longer add a prorty to a geometry in Shapely 2.0 because the type is immutable](https://gis.stackexchange.com/questions/114644/adding-a-property-attribute-to-a-geometry-in-shapely-fiona). [They recommend to use a GeoDataFrame from GeoPandas](https://shapely.readthedocs.io/en/latest/migration.html#setting-custom-attributes).
+
+So I will just use GeoPandas.
+
+Spatial Join
+
+https://geopandas.org/en/stable/gallery/spatial_joins.html

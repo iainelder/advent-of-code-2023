@@ -1,15 +1,31 @@
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, List
 
 import pytest
-from lark import Lark
+from lark import Token
 
 from advent_of_code.day03.schematic import Schematic
 
+# Puzzle tests
 
-def write_lines(path: Path, lines: Iterable[str]):
+
+@pytest.mark.parametrize(
+    "schematic_path,part_sum",
+    [
+        ("advent_of_code/day03/input/sample", 4361),
+    ],
+)
+def test_solves_day03(schematic_path: str, part_sum: int) -> None:
+    schematic = Schematic(Path(schematic_path))
+    assert schematic.part_sum() == part_sum
+
+
+# Unit tests
+
+
+def write_lines(path: Path, lines: Iterable[str]) -> None:
     with path.open("w") as file:
-        print(*lines, file=file)
+        print(*lines, sep="\n", file=file)
 
 
 @pytest.fixture()
@@ -21,32 +37,34 @@ def tmp_input(tmp_path: Path) -> Path:
     "lines,part_sum",
     [
         (["*"], 0),
-        (["1*"], 1),
+        pytest.param(["1*"], 1),
     ],
 )
-def test_part_sum(tmp_input: Path, lines: str, part_sum: int):
+def test_part_sum(tmp_input: Path, lines: str, part_sum: int) -> None:
     write_lines(tmp_input, lines)
     assert Schematic(tmp_input).part_sum() == part_sum
 
 
 @pytest.mark.parametrize(
-    "lines",
+    "lines,expected",
     [
-        ("1 22 333",),
+        (
+            ["1"],
+            [
+                Token(
+                    "INT",
+                    "1",
+                    start_pos=1,
+                    line=1,
+                    column=1,
+                    end_line=1,
+                    end_column=1,
+                    end_pos=1,
+                )
+            ],
+        )
     ],
 )
-def test_lark(tmp_input: Path, lines: str):
+def test_iter_tokens(tmp_input: Path, lines: str, expected: List[str]) -> None:
     write_lines(tmp_input, lines)
-
-    grammar = r"""
-    start: NUMBER*
-    %import common.NUMBER
-    %import common.WS
-    %ignore WS
-    """
-
-    parser = Lark(grammar)
-
-    with tmp_input.open() as file:
-        values = list(token.value for token in parser.lex(file.read()))
-        assert values == ["1", "22", "333"]
+    assert expected == list(Schematic(tmp_input).iter_tokens())
