@@ -55,7 +55,7 @@ class Schematic:
 
 GRAMMAR = r"""
 start: [INT|SYMBOL]*
-SYMBOL: "*"|"#"|"+"|"$"
+SYMBOL: "*"|"#"|"+"|"$"|"-"|"%"|"/"|"&"|"="|"@"
 SPACE: "."
 %import common.INT
 %import common.NEWLINE

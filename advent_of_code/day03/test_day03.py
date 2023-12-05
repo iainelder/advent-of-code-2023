@@ -13,6 +13,7 @@ from advent_of_code.day03.schematic import Schematic
     "schematic_path,part_sum",
     [
         ("advent_of_code/day03/input/sample", 4361),
+        ("advent_of_code/day03/input/puzzle", 532428),
     ],
 )
 def test_solves_day03(schematic_path: str, part_sum: int) -> None:
