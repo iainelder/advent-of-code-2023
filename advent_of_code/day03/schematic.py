@@ -17,7 +17,6 @@ class SpatialToken:
 class Schematic:
     def __init__(self, path: Path) -> None:
         self.path = path
-        self.parser = Lark(GRAMMAR)
 
     def part_sum(self) -> int:
         gdf = self.data_frame()
@@ -42,8 +41,7 @@ class Schematic:
         return answer
 
     def iter_tokens(self) -> Iterable[Token]:
-        for token in self.parser.lex(self.path.read_text()):
-            yield token
+        yield from Lark(GRAMMAR).lex(self.path.read_text())
 
     def data_frame(self) -> gpd.GeoDataFrame:
         gdf = gpd.GeoDataFrame(self.iter_spatial_tokens())
