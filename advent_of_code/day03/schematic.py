@@ -1,14 +1,17 @@
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, TypedDict
+from typing import Iterable
 
 import geopandas as gpd  # type: ignore[import-untyped]
 from lark import Lark, Token
 from shapely import Polygon  # type: ignore[import-untyped]
 
 
-class _TokenPoly(TypedDict):
-    token: Token
-    poly: Polygon
+@dataclass
+class SpatialToken:
+    polygon: Polygon
+    type: str
+    text: str
 
 
 class Schematic:
@@ -18,20 +21,18 @@ class Schematic:
 
     def part_sum(self) -> int:
         gdf = self.data_frame()
-        symbols = gdf[gdf["token"].apply(lambda x: x.type) == "SYMBOL"]
-        numbers = gdf[gdf["token"].apply(lambda x: x.type) == "INT"]
-        return int(
-            symbols.sjoin(numbers)["token_right"].apply(lambda t: int(t.value)).sum()
-        )
+        symbols = gdf[gdf["type"] == "SYMBOL"]
+        numbers = gdf[gdf["type"] == "INT"]
+        return int(symbols.sjoin(numbers)["text_right"].astype(int).sum())
 
     def gear_ratio_sum(self) -> int:
         gdf = self.data_frame()
-        stars = gdf[gdf["token"].apply(lambda x: x.type == "SYMBOL" and x.value == "*")]
-        numbers = gdf[gdf["token"].apply(lambda x: x.type) == "INT"]
+        stars = gdf[gdf["text"] == "*"]
+        numbers = gdf[gdf["type"] == "INT"]
 
         answer = int(
-            stars.sjoin(numbers)["token_right"]
-            .apply(lambda t: int(t.value))
+            stars.sjoin(numbers)["text_right"]
+            .astype(int)
             .groupby(level=0)
             .agg(["size", "prod"])
             .query("size == 2")["prod"]
@@ -45,14 +46,18 @@ class Schematic:
             yield token
 
     def data_frame(self) -> gpd.GeoDataFrame:
-        gdf = gpd.GeoDataFrame(self._iter_token_polys(), columns=["token", "poly"])
-        gdf.set_geometry("poly", inplace=True)
+        gdf = gpd.GeoDataFrame(self.iter_spatial_tokens())
+        gdf.set_geometry("polygon", inplace=True)
         gdf.rename_axis("ID", axis="columns", inplace=True)
         return gdf
 
-    def _iter_token_polys(self) -> Iterable[_TokenPoly]:
+    def iter_spatial_tokens(self) -> Iterable[SpatialToken]:
         for token in self.iter_tokens():
-            yield _TokenPoly(token=token, poly=Schematic.polygon(token))
+            yield SpatialToken(
+                polygon=Schematic.polygon(token),
+                type=token.type,
+                text=token.value,
+            )
 
     @staticmethod
     def polygon(token: Token) -> Polygon:
