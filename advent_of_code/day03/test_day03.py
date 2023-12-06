@@ -16,9 +16,21 @@ from advent_of_code.day03.schematic import Schematic
         ("advent_of_code/day03/input/puzzle", 532428),
     ],
 )
-def test_solves_day03(schematic_path: str, part_sum: int) -> None:
+def test_solves_day03_part1(schematic_path: str, part_sum: int) -> None:
     schematic = Schematic(Path(schematic_path))
     assert schematic.part_sum() == part_sum
+
+
+@pytest.mark.parametrize(
+    "schematic_path,gear_ratio_sum",
+    [
+        ("advent_of_code/day03/input/sample", 467835),
+        ("advent_of_code/day03/input/puzzle", 84051670),
+    ],
+)
+def test_solves_day03_part2(schematic_path: str, gear_ratio_sum: int) -> None:
+    schematic = Schematic(Path(schematic_path))
+    assert schematic.gear_ratio_sum() == gear_ratio_sum
 
 
 # Unit tests

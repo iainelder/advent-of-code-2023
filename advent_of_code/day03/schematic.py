@@ -24,6 +24,22 @@ class Schematic:
             symbols.sjoin(numbers)["token_right"].apply(lambda t: int(t.value)).sum()
         )
 
+    def gear_ratio_sum(self) -> int:
+        gdf = self.data_frame()
+        stars = gdf[gdf["token"].apply(lambda x: x.type == "SYMBOL" and x.value == "*")]
+        numbers = gdf[gdf["token"].apply(lambda x: x.type) == "INT"]
+
+        answer = int(
+            stars.sjoin(numbers)["token_right"]
+            .apply(lambda t: int(t.value))
+            .groupby(level=0)
+            .agg(["size", "prod"])
+            .query("size == 2")["prod"]
+            .sum()
+        )
+
+        return answer
+
     def iter_tokens(self) -> Iterable[Token]:
         for token in self.parser.lex(self.path.read_text()):
             yield token
@@ -31,6 +47,7 @@ class Schematic:
     def data_frame(self) -> gpd.GeoDataFrame:
         gdf = gpd.GeoDataFrame(self._iter_token_polys(), columns=["token", "poly"])
         gdf.set_geometry("poly", inplace=True)
+        gdf.rename_axis("ID", axis="columns", inplace=True)
         return gdf
 
     def _iter_token_polys(self) -> Iterable[_TokenPoly]:
