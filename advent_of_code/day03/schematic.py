@@ -17,37 +17,33 @@ class SpatialToken:
 class Schematic:
     def __init__(self, path: Path) -> None:
         self.path = path
+        self.symbols, self.numbers = self.build_data_frames()
 
     def part_sum(self) -> int:
-        gdf = self.data_frame()
-        symbols = gdf[gdf["type"] == "SYMBOL"]
-        numbers = gdf[gdf["type"] == "INT"]
-        return int(symbols.sjoin(numbers)["text_right"].astype(int).sum())
+        return sum(self.symbols.sjoin(self.numbers)["value"])
 
     def gear_ratio_sum(self) -> int:
-        gdf = self.data_frame()
-        stars = gdf[gdf["text"] == "*"]
-        numbers = gdf[gdf["type"] == "INT"]
+        stars = self.symbols[self.symbols["text"] == "*"]
 
-        answer = int(
-            stars.sjoin(numbers)["text_right"]
-            .astype(int)
+        return sum(
+            stars.sjoin(self.numbers)["value"]
             .groupby(level=0)
             .agg(["size", "prod"])
             .query("size == 2")["prod"]
-            .sum()
         )
-
-        return answer
 
     def iter_tokens(self) -> Iterable[Token]:
         yield from Lark(GRAMMAR).lex(self.path.read_text())
 
-    def data_frame(self) -> gpd.GeoDataFrame:
-        gdf = gpd.GeoDataFrame(self.iter_spatial_tokens())
-        gdf.set_geometry("polygon", inplace=True)
-        gdf.rename_axis("ID", axis="columns", inplace=True)
-        return gdf
+    def build_data_frames(self) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+        gdf = gpd.GeoDataFrame(self.iter_spatial_tokens()).set_geometry("polygon")
+        symbols = gdf[gdf["type"] == "SYMBOL"][["polygon", "text"]]
+        numbers = (
+            gdf[gdf["type"] == "INT"][["polygon", "text"]]
+            .astype({"text": int})
+            .rename(columns={"text": "value"})
+        )
+        return symbols, numbers
 
     def iter_spatial_tokens(self) -> Iterable[SpatialToken]:
         for token in self.iter_tokens():
