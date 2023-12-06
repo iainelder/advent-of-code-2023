@@ -26,3 +26,14 @@ The secondary goal is to learn more about the Python programming language, its s
 * It's easier to group the test day with each day's solution
 * Use table-driven tests to avoid test code repitition
 * Part 2 was easy because I already found a good abstraction in part 1 (`max_hand` is what they call the "minimum set of cubes")
+
+## Day 3
+
+[See full notes for day 3](advent_of_code/day03/README.md)
+
+* Researching the tools takes longer than coding the solution
+* [Lark](https://github.com/lark-parser/lark) provides a tokenizer for strings confugirable using a declarative language to describe a grammar.
+* Lark counts token row and column positions in the string
+* [GeoPandas](https://geopandas.org/en/stable/) is a geopspatial extension to Pandas
+* GeoPandas supports spatial joins
+* GeoPandas probably uses an [R-tree](https://en.wikipedia.org/wiki/R-tree) implementation from its [Shapely](https://shapely.readthedocs.io/en/stable/strtree.html) or [rtree](https://rtree.readthedocs.io/en/latest/index.html) dependencies
