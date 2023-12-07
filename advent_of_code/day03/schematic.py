@@ -13,6 +13,29 @@ class SpatialToken:
     type: str
     text: str
 
+    @classmethod
+    def from_token(cls, token: Token) -> "SpatialToken":
+        return cls(
+            polygon=cls.bounding_box(token),
+            type=token.type,
+            text=token.value,
+        )
+
+    @staticmethod
+    def bounding_box(token: Token) -> Polygon:
+        assert isinstance(token.line, int)
+        assert isinstance(token.column, int)
+        assert isinstance(token.end_column, int)
+
+        coords = (
+            (token.line, token.column),
+            (token.line, token.end_column),
+            (token.line + 1, token.end_column),
+            (token.line + 1, token.column),
+            (token.line, token.column),
+        )
+        return Polygon(coords)
+
 
 class Schematic:
     def __init__(self, path: Path) -> None:
@@ -32,9 +55,6 @@ class Schematic:
             .query("size == 2")["prod"]
         )
 
-    def iter_tokens(self) -> Iterable[Token]:
-        yield from Lark(GRAMMAR).lex(self.path.read_text())
-
     def build_data_frames(self) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         gdf = gpd.GeoDataFrame(self.iter_spatial_tokens()).set_geometry("polygon")
         symbols = gdf[gdf["type"] == "SYMBOL"][["polygon", "text"]]
@@ -47,26 +67,10 @@ class Schematic:
 
     def iter_spatial_tokens(self) -> Iterable[SpatialToken]:
         for token in self.iter_tokens():
-            yield SpatialToken(
-                polygon=Schematic.polygon(token),
-                type=token.type,
-                text=token.value,
-            )
+            yield SpatialToken.from_token(token)
 
-    @staticmethod
-    def polygon(token: Token) -> Polygon:
-        assert isinstance(token.line, int)
-        assert isinstance(token.column, int)
-        assert isinstance(token.end_column, int)
-
-        coords = (
-            (token.line, token.column),
-            (token.line, token.end_column),
-            (token.line + 1, token.end_column),
-            (token.line + 1, token.column),
-            (token.line, token.column),
-        )
-        return Polygon(coords)
+    def iter_tokens(self) -> Iterable[Token]:
+        yield from Lark(GRAMMAR).lex(self.path.read_text())
 
 
 GRAMMAR = r"""
