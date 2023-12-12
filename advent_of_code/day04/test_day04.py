@@ -24,6 +24,7 @@ def test_solves_day04_part1(card_file: str, score: int) -> None:
     "card_file,score",
     [
         ("advent_of_code/day04/input/sample", 30),
+        ("advent_of_code/day04/input/puzzle", 13768818),
     ],
 )
 def test_solves_day04_part2(card_file: str, score: int) -> None:
