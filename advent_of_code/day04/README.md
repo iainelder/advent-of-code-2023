@@ -11,3 +11,9 @@ The Counter indexes ah object by its hash. Change the `__hash__` method of the c
 No, that won't work because I still can't just use an int to index into the Counter.
 
 Try copying the iterator and looking ahead.
+
+That works! I implemented it first using itertools' `tee` function and its `take` recipe.
+
+The more-itertools package has a peekable iterator. Try that to see if it makes the code simpler.
+
+That works too. It's maybe slightly more readable, and may be more efficient although I don't test for that.

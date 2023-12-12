@@ -1,9 +1,9 @@
 import re
 from collections import Counter
 from dataclasses import dataclass
-from itertools import islice, tee
 from pathlib import Path
 from typing import Iterable
+from more_itertools import peekable
 
 
 class Scratchcard:
@@ -48,14 +48,13 @@ class CopiesGame:
         self.card_counter = Counter(read_cards(card_file))
 
     def count_originals_and_copies(self) -> int:
-        card_iter = iter(self.card_counter)
+        card_iter = peekable(self.card_counter)
         try:
             while True:
                 card = next(card_iter)
                 next_cards_to_copy = len(card.your_winners)
                 number_of_copies = self.card_counter[card]
-                card_iter, peeker = tee(card_iter)
-                for next_card in islice(peeker, next_cards_to_copy):
+                for next_card in card_iter[:next_cards_to_copy]:
                     self.card_counter[next_card] += number_of_copies
         except StopIteration:
             pass

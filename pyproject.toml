@@ -11,6 +11,7 @@ regex = "^2023.10.3"
 lark = "^1.1.8"
 geopandas = "^0.14.1"
 shapely = "^2.0.2"
+more-itertools = "^10.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

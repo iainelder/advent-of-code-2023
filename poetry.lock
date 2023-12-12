@@ -665,6 +665,17 @@ files = [
 traitlets = "*"
 
 [[package]]
+name = "more-itertools"
+version = "10.1.0"
+description = "More routines for operating on iterables, beyond itertools"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "more-itertools-10.1.0.tar.gz", hash = "sha256:626c369fa0eb37bac0291bce8259b332fd59ac792fa5497b59837309cd5b114a"},
+    {file = "more_itertools-10.1.0-py3-none-any.whl", hash = "sha256:64e0735fcfdc6f3464ea133afe8ea4483b1c5fe3a3d69852e6503b43a0b222e6"},
+]
+
+[[package]]
 name = "mypy"
 version = "1.7.1"
 description = "Optional static typing for Python"
@@ -1510,4 +1521,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f358c76d8ad0586a32aa833bda5324b21fc79344687ba929b605866edc7d482e"
+content-hash = "e713a6ce375c880ea6c666a532e782042d15bf6ae1883a2810b74201717853d0"
