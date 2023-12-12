@@ -1,4 +1,6 @@
-# Part 2
+# Day 4 Notes
+
+## Part 2
 
 The counter class is just what I need to count copies of cards and tell the total.
 
