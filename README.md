@@ -37,3 +37,7 @@ The secondary goal is to learn more about the Python programming language, its s
 * [GeoPandas](https://geopandas.org/en/stable/) is a geopspatial extension to Pandas
 * GeoPandas supports spatial joins
 * GeoPandas probably uses an [R-tree](https://en.wikipedia.org/wiki/R-tree) implementation from its [Shapely](https://shapely.readthedocs.io/en/stable/strtree.html) or [rtree](https://rtree.readthedocs.io/en/latest/index.html) dependencies
+
+## Day 4
+
+* Exponent is not the same as iterated multiplication! `2 ** 0 = 1` and `2 ** -1 = 0.5`.
