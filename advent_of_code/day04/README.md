@@ -2,6 +2,8 @@
 
 ## Part 2
 
+2023-12-12.
+
 The counter class is just what I need to count copies of cards and tell the total.
 
 But it doesn't have an index that makes it easy to access the n+1'th card while iterating.
