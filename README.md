@@ -41,3 +41,8 @@ The secondary goal is to learn more about the Python programming language, its s
 ## Day 4
 
 * Exponent is not the same as iterated multiplication! `2 ** 0 = 1` and `2 ** -1 = 0.5`.
+
+## Day 5
+
+* Poetry's own virtualenv can cause problems when installing packages that need things like distutils to install them.
+* Use Pipx's `--python` option to choose a later Python runtime to avoid those problems
