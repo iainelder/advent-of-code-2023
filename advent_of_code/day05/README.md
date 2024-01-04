@@ -288,3 +288,24 @@ I want to use syntax like this to solve the problem.
 ```python
 almanac.seed(3)["location"].number
 ```
+
+## Solve part 1
+
+2024-01-04.
+
+Thinking first about what the solution syntax looks like and then writing a lot of unit tests around the parts helped to develop a clean implementation.
+
+## Spñve part 2
+
+2024-01-04.
+
+I should be able to solve this with only a small change to processing of the seed number input.
+
+Upgrade to Python 3.12 to use the `batched` function of itertools. Check notes from day 2 for how to upgrade from Python 3.8 to Python 3.10.
+
+```bash
+sudo apt install python3.12 # From deadsnakes PPA
+poetry env use python3.12
+poetry install
+poetry run pre-commit run --all-files
+```

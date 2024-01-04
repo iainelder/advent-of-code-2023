@@ -65,6 +65,9 @@ class Almanac:
         tree = Lark(GRAMMAR, start="almanac").parse(almanac_file.read_text())
         return cast("Almanac", AlmanacTransformer().transform(tree))
 
+    # def seed_numbers_as_ranges(self) -> list(range):
+    #     return itertools.batched(self.seed_numbers, 2)
+
     def seed(self, value: int) -> Number:
         return self.number("seed", value)
 
