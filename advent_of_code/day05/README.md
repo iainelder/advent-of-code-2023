@@ -325,4 +325,13 @@ The redifinition of the problem exploded the amount of work that my program has 
 
 I cancel about 12 minutes into the run. It's doing a stupid amount of extra work because it's mapping each value in a range where most of the sources will have the same destination.
 
-TODO: Use the range indexes to figure out what the unique ranges are.
+## Use range indexes to find unique ranges
+
+2024-01-04.
+
+Cases to consider:
+
+1. Source interval is a subset of a range -> Translate to one destination interval
+2. Search interval overlaps a range -> Split source and treat part like 1 and part like 4
+3. Search interval contains a range -> Split source and treat part like 1 and part like 4
+4. Search interval is disjoint from all ranges - No translation; destination interval is the same
