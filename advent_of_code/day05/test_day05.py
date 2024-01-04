@@ -14,7 +14,19 @@ from advent_of_code.day05.almanac import Almanac, Number
 )
 def test_solves_day05_part1(almanac_file: Path, location_number: int) -> None:
     almanac = Almanac.from_file(almanac_file)
-    assert almanac.lowest_location_number() == location_number
+    assert almanac.lowest_location_number(almanac.seed_numbers) == location_number
+
+
+@pytest.mark.parametrize(
+    "almanac_file,location_number",
+    [
+        (Path("advent_of_code/day05/input/sample"), 46),
+        (Path("advent_of_code/day05/input/puzzle"), 0),
+    ],
+)
+def test_solves_day05_part2(almanac_file: Path, location_number: int) -> None:
+    almanac = Almanac.from_file(almanac_file)
+    assert almanac.lowest_location_number(almanac.seed_numbers_from_ranges()) == location_number
 
 
 # Unit tests
@@ -27,6 +39,16 @@ def almanac() -> Almanac:
 
 def test_almanac_has_seed_numbers(almanac: Almanac) -> None:
     assert almanac.seed_numbers == [79, 14, 55, 13]
+
+
+def test_almanac_has_seed_numbers_as_ranges(almanac: Almanac) -> None:
+    assert list(almanac.seed_number_ranges) == [range(79, 93), range(55, 68)]
+
+
+def test_almanac_has_seed_numbers_in_ranges(almanac: Almanac) -> None:
+    seed_numbers = list(almanac.seed_numbers_from_ranges())
+    assert seed_numbers[:3] == [79, 80, 81]
+    assert seed_numbers[-3:] == [65 ,66, 67]
 
 
 def test_almanac_has_categories(almanac: Almanac) -> None:

@@ -309,3 +309,20 @@ poetry env use python3.12
 poetry install
 poetry run pre-commit run --all-files
 ```
+
+All the tests still pass, and there is one warning about a deprecated datetime method. I don't know where it comes from. I don't call the method in my own code.
+
+```text
+================================================== warnings summary ==================================================
+../../../.cache/pypoetry/virtualenvs/advent-of-code-fP-JUSe0-py3.12/lib/python3.12/site-packages/dateutil/tz/tz.py:37
+  /home/isme/.cache/pypoetry/virtualenvs/advent-of-code-fP-JUSe0-py3.12/lib/python3.12/site-packages/dateutil/tz/tz.py:37: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    EPOCH = datetime.datetime.utcfromtimestamp(0)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+```
+
+The redifinition of the problem exploded the amount of work that my program has to do. This is the first puzzle that doesn't complete too quickly to time. It's churning away for several seconds, minutes, long enough for me to take a break and come back. This is the first puzzle where optimization may matter.
+
+I cancel about 12 minutes into the run. It's doing a stupid amount of extra work because it's mapping each value in a range where most of the sources will have the same destination.
+
+TODO: Use the range indexes to figure out what the unique ranges are.

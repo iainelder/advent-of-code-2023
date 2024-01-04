@@ -1,3 +1,4 @@
+from itertools import batched, chain
 from typing import cast, Sequence, Iterable
 from lark import Lark, Transformer, Token
 from dataclasses import dataclass, field
@@ -65,8 +66,14 @@ class Almanac:
         tree = Lark(GRAMMAR, start="almanac").parse(almanac_file.read_text())
         return cast("Almanac", AlmanacTransformer().transform(tree))
 
-    # def seed_numbers_as_ranges(self) -> list(range):
-    #     return itertools.batched(self.seed_numbers, 2)
+    @property
+    def seed_number_ranges(self) -> Iterable[range]:
+        for start, length in batched(self.seed_numbers, 2):
+            yield range(start, start + length)
+
+
+    def seed_numbers_from_ranges(self) -> Iterable[int]:
+        yield from chain.from_iterable(self.seed_number_ranges)
 
     def seed(self, value: int) -> Number:
         return self.number("seed", value)
@@ -96,9 +103,8 @@ class Almanac:
             number = self.number(category=map.dest, value=map.map(number.value))
             yield number
 
-    def lowest_location_number(self) -> int:
-        return min(self.seed(n)["location"].value for n in self.seed_numbers)
-
+    def lowest_location_number(self, seed_numbers: Iterable[int]) -> int:
+        return min(self.seed(n)["location"].value for n in seed_numbers)
 
 # Lark doesn't document any type args.
 class AlmanacTransformer(Transformer):  # type: ignore[type-arg]
