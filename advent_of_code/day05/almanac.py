@@ -51,7 +51,7 @@ class Number:
 
 @dataclass(frozen=True)
 class Almanac:
-    seeds: Sequence[int]
+    seed_numbers: Sequence[int]
     maps: Sequence[Map]
     categories: list[str] = field(init=False)
 
@@ -93,11 +93,16 @@ class Almanac:
             number = self.number(category=map.dest, value=map.map(number.value))
             yield number
 
+    def lowest_location_number(self) -> int:
+        return min(self.seed(n)["location"].value for n in self.seed_numbers)
+
 
 # Lark doesn't document any type args.
 class AlmanacTransformer(Transformer):  # type: ignore[type-arg]
     def almanac(self, items: list[list[int] | Map]) -> Almanac:
-        return Almanac(seeds=cast(list[int], items[0]), maps=cast(list[Map], items[1:]))
+        return Almanac(
+            seed_numbers=cast(list[int], items[0]), maps=cast(list[Map], items[1:])
+        )
 
     def seeds(self, items: list[Token]) -> list[int]:
         return [int(i) for i in items]
@@ -128,5 +133,3 @@ range: INT INT INT
 %import common.WS
 %ignore WS
 """
-
-# almanac.seed(3)["location"].number

@@ -2,10 +2,30 @@ from pathlib import Path
 import pytest
 from advent_of_code.day05.almanac import Almanac, Number
 
+# Puzzle tests
+
+
+@pytest.mark.parametrize(
+    "almanac_file,location_number",
+    [
+        (Path("advent_of_code/day05/input/sample"), 35),
+    ],
+)
+def test_solves_day05_part1(almanac_file: Path, location_number: int) -> None:
+    almanac = Almanac.from_file(almanac_file)
+    assert almanac.lowest_location_number() == location_number
+
+
+# Unit tests
+
 
 @pytest.fixture
 def almanac() -> Almanac:
     return Almanac.from_file(Path("advent_of_code/day05/input/sample"))
+
+
+def test_almanac_has_seed_numbers(almanac: Almanac) -> None:
+    assert almanac.seed_numbers == [79, 14, 55, 13]
 
 
 def test_almanac_has_categories(almanac: Almanac) -> None:
