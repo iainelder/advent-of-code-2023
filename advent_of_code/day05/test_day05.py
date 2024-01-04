@@ -9,6 +9,7 @@ from advent_of_code.day05.almanac import Almanac, Number
     "almanac_file,location_number",
     [
         (Path("advent_of_code/day05/input/sample"), 35),
+        (Path("advent_of_code/day05/input/puzzle"), 650599855),
     ],
 )
 def test_solves_day05_part1(almanac_file: Path, location_number: int) -> None:
