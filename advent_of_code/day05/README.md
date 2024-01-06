@@ -335,3 +335,13 @@ Cases to consider:
 2. Search interval overlaps a range -> Split source and treat part like 1 and part like 4
 3. Search interval contains a range -> Split source and treat part like 1 and part like 4
 4. Search interval is disjoint from all ranges - No translation; destination interval is the same
+
+I need to break down each source interval to a set of intervals in case 1 and case 4.
+
+## Consider now to refactor the solution
+
+2023-12-06.
+
+I extracted a "seed locator" class. Now the almanac and its supporters are just data classes. Now I can more easily add a "range locator" class.
+
+I removed any code to solve the day 2 part since it wasn't working properly anyway.

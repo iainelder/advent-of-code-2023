@@ -1,4 +1,4 @@
-from itertools import batched, chain
+from itertools import islice
 from typing import cast, Sequence, Iterable
 from lark import Lark, Transformer, Token
 from dataclasses import dataclass, field
@@ -7,7 +7,7 @@ from intervaltree import IntervalTree, Interval  # type: ignore[import-untyped]
 
 
 @dataclass(frozen=True)
-class Range:
+class MapRange:
     dest_start: int
     source_start: int
     source_length: int
@@ -24,7 +24,7 @@ class Range:
 class Map:
     source: str
     dest: str
-    ranges: Sequence[Range]
+    ranges: Sequence[MapRange]
     tree: IntervalTree = field(init=False)
 
     def __post_init__(self) -> None:
@@ -43,10 +43,10 @@ class Map:
 class Number:
     category: str
     value: int
-    almanac: "Almanac" = field(repr=False)
+    locator: "SeedLocator" = field(repr=False)
 
     def __getitem__(self, item: str) -> "Number":
-        *_, last = self.almanac.iter_mappings(self, dest=item)
+        *_, last = self.locator.iter_mappings(self, dest=item)
         return last
 
 
@@ -66,45 +66,6 @@ class Almanac:
         tree = Lark(GRAMMAR, start="almanac").parse(almanac_file.read_text())
         return cast("Almanac", AlmanacTransformer().transform(tree))
 
-    @property
-    def seed_number_ranges(self) -> Iterable[range]:
-        for start, length in batched(self.seed_numbers, 2):
-            yield range(start, start + length)
-
-
-    def seed_numbers_from_ranges(self) -> Iterable[int]:
-        yield from chain.from_iterable(self.seed_number_ranges)
-
-    def seed(self, value: int) -> Number:
-        return self.number("seed", value)
-
-    def number(self, category: str, value: int) -> Number:
-        return Number(category=category, value=value, almanac=self)
-
-    def iter_mappings(
-        self, number: Number, dest: str | None = None
-    ) -> Iterable[Number]:
-        yield number
-
-        if number.category == dest:
-            return
-
-        start = self.categories.index(number.category)
-
-        if dest is None:
-            stop = len(self.categories)
-        else:
-            stop = self.categories.index(dest)
-
-        if stop < start:
-            raise ValueError(f"'{dest}' precedes in list")
-
-        for map in self.maps[start:stop]:
-            number = self.number(category=map.dest, value=map.map(number.value))
-            yield number
-
-    def lowest_location_number(self, seed_numbers: Iterable[int]) -> int:
-        return min(self.seed(n)["location"].value for n in seed_numbers)
 
 # Lark doesn't document any type args.
 class AlmanacTransformer(Transformer):  # type: ignore[type-arg]
@@ -116,15 +77,15 @@ class AlmanacTransformer(Transformer):  # type: ignore[type-arg]
     def seeds(self, items: list[Token]) -> list[int]:
         return [int(i) for i in items]
 
-    def map(self, items: list[Token | Range]) -> Map:
+    def map(self, items: list[Token | MapRange]) -> Map:
         return Map(
             source=str(items[0]),
             dest=str(items[1]),
-            ranges=cast(list[Range], items[2:]),
+            ranges=cast(list[MapRange], items[2:]),
         )
 
-    def range(self, items: list[Token]) -> Range:
-        return Range(
+    def range(self, items: list[Token]) -> MapRange:
+        return MapRange(
             dest_start=int(items[0]),
             source_start=int(items[1]),
             source_length=int(items[2]),
@@ -142,3 +103,64 @@ range: INT INT INT
 %import common.WS
 %ignore WS
 """
+
+
+@dataclass(frozen=True)
+class SeedLocator:
+    almanac: Almanac
+    intervals: list[IntervalTree]
+
+    @staticmethod
+    def from_almanac(almanac: Almanac) -> "SeedLocator":
+        intervals = [SeedLocator.tree(m) for m in almanac.maps]
+        return SeedLocator(almanac, intervals)
+
+    @staticmethod
+    def interval(mr: MapRange) -> Interval:
+        return Interval(
+            begin=mr.source_start,
+            end=mr.source_start + mr.source_length,
+            data=mr.dest_start,
+        )
+
+    @staticmethod
+    def tree(m: Map) -> IntervalTree:
+        return IntervalTree(SeedLocator.interval(r) for r in m.ranges)
+
+    def seed(self, value: int) -> Number:
+        return self.number("seed", value)
+
+    def number(self, category: str, value: int) -> Number:
+        return Number(category=category, value=value, locator=self)
+
+    def lowest_location_number(self) -> int:
+        return min(self.seed(n)["location"].value for n in self.almanac.seed_numbers)
+
+    @staticmethod
+    def map(tree: IntervalTree, value: int) -> int:
+        for iv in tree[value]:
+            offset: int = iv.data - iv.begin
+            return value + offset
+        return value
+
+    def iter_mappings(
+        self, number: Number, dest: str | None = None
+    ) -> Iterable[Number]:
+        yield number
+
+        if number.category == dest:
+            return
+
+        start = self.almanac.categories.index(number.category)
+
+        if dest is None:
+            stop = len(self.almanac.categories)
+        else:
+            stop = self.almanac.categories.index(dest)
+
+        if stop < start:
+            raise ValueError(f"'{dest}' precedes in list")
+
+        for tree, map in islice(zip(self.intervals, self.almanac.maps), start, stop):
+            number = self.number(category=map.dest, value=self.map(tree, number.value))
+            yield number
