@@ -338,6 +338,12 @@ Cases to consider:
 
 I need to break down each source interval to a set of intervals in case 1 and case 4.
 
+I call cases 2 and 3 "complex intervals".
+
+I call cases 1 and 4 "simple intervals".
+
+A complex interval can be broken down into simple intervals.
+
 ## Consider now to refactor the solution
 
 2023-12-06.
